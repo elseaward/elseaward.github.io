@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Color Settings - Synesthesia Visualizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(90deg, #ff0000, #ff8000, #ffff00, #00ff00, #0000ff, #8000ff);
+            box-sizing: border-box;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .home-button {
+            text-decoration: none;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .settings-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        .settings-section {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .color-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .color-item:last-child {
+            border-bottom: none;
+        }
+        .color-preview {
+            font-family: 'Noto Sans Math', 'Arial Unicode MS', sans-serif;
+            font-size: 24px;
+            margin-right: 10px;
+            min-width: 30px;
+            text-align: center;
+        }
+        .color-item input[type="color"] {
+            width: 50px;
+            height: 30px;
+            padding: 0;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .save-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .save-button:hover {
+            background-color: #45a049;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #333;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .settings-section-title {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        .symbol-name {
+            font-size: 14px;
+            color: #666;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{% url 'visualizer:landing' %}" class="home-button">Synesthesia Visualizer</a>
+    </div>
+
+    <div style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+        <h1>Color Settings</h1>
+        <p>Customize the colors for each character:</p>
+        
+        <form id="colorForm" method="POST" action="{% url 'visualizer:save_colors' %}">
+            {% csrf_token %}
+            <div class="settings-container">
+                <div class="settings-section">
+                    <div class="settings-section-title">Letters</div>
+                    {% for char, color in colors.items %}
+                        {% if char|length == 1 and char|lower in "abcdefghijklmnopqrstuvwxyz" %}
+                        <div class="color-item">
+                            <div class="color-preview" style="color: {{ color }}">{{ char }}</div>
+                            <input type="color" id="color_{{ char }}" name="color_{{ char }}" value="{{ color }}">
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">Numbers</div>
+                    {% for char, color in colors.items %}
+                        {% if char|length == 1 and char in "0123456789" %}
+                        <div class="color-item">
+                            <div class="color-preview" style="color: {{ color }}">{{ char }}</div>
+                            <input type="color" id="color_{{ char }}" name="color_{{ char }}" value="{{ color }}">
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">Mathematical Symbols</div>
+                    <!-- Basic Math -->
+                    {% for char, color in colors.items %}
+                        {% if char in "±√π%∞∫∑∏Δ≈≠≤≥" %}
+                        <div class="color-item">
+                            <div class="color-preview" style="color: {{ color }}">{{ char }}</div>
+                            <input type="color" id="color_{{ char }}" name="color_{{ char }}" value="{{ color }}">
+                            <span class="symbol-name">
+                                {% if char == "±" %}(Plus-Minus)
+                                {% elif char == "√" %}(Square Root)
+                                {% elif char == "π" %}(Pi)
+                                {% elif char == "%" %}(Percent)
+                                {% elif char == "∞" %}(Infinity)
+                                {% elif char == "∫" %}(Integral)
+                                {% elif char == "∑" %}(Summation)
+                                {% elif char == "∏" %}(Product)
+                                {% elif char == "Δ" %}(Delta)
+                                {% elif char == "≈" %}(Approximately Equal)
+                                {% elif char == "≠" %}(Not Equal)
+                                {% elif char == "≤" %}(Less Than or Equal)
+                                {% elif char == "≥" %}(Greater Than or Equal)
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">Special Characters</div>
+                    {% for char, color in colors.items %}
+                        {% if char in " .,!?" %}
+                        <div class="color-item">
+                            <div class="color-preview" style="color: {{ color }}">{{ char }}</div>
+                            <input type="color" id="color_{{ char }}" name="color_{{ char }}" value="{{ color }}">
+                            <span class="symbol-name">
+                                {% if char == " " %}(Space)
+                                {% elif char == "." %}(Period)
+                                {% elif char == "," %}(Comma)
+                                {% elif char == "!" %}(Exclamation)
+                                {% elif char == "?" %}(Question)
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <button type="submit" class="save-button">Save Colors</button>
+        </form>
+        
+        <a href="{% url 'visualizer:landing' %}" class="back-link">← Back to Home</a>
+    </div>
+
+    <script>
+    document.getElementById('colorForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch('{% url "visualizer:save_colors" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Colors saved successfully!');
+                // Update the preview text colors
+                for (let input of document.querySelectorAll('input[type="color"]')) {
+                    let char = input.id.replace('color_', '');
+                    let preview = input.parentElement.querySelector('.color-preview');
+                    preview.style.color = input.value;
+                }
+            } else {
+                alert('Error saving colors');
+            }
+        });
+    });
+
+    // Update preview on color change
+    document.querySelectorAll('input[type="color"]').forEach(input => {
+        input.addEventListener('input', function(e) {
+            let preview = this.parentElement.querySelector('.color-preview');
+            preview.style.color = this.value;
+        });
+    });
+    </script>
+</body>
+</html>

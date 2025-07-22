@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sequence-Space Synesthesia - Visualizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(90deg, #ff0000, #ff8000, #ffff00, #00ff00, #0000ff, #8000ff);
+            box-sizing: border-box;
+            color: white;
+        }
+        .home-button {
+            text-decoration: none;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .profile-menu {
+            position: relative;
+            cursor: pointer;
+            color: white;
+        }
+        .profile-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+        .profile-dropdown.show {
+            display: block;
+        }
+        .profile-item {
+            padding: 8px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #333;
+        }
+        .profile-item:hover {
+            background-color: #f5f5f5;
+        }
+        .active-profile {
+            background-color: #e8f4e8;
+        }
+        .content {
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .coming-soon {
+            font-size: 20px;
+            color: #666;
+            padding: 40px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            background-image: linear-gradient(white, white), 
+                linear-gradient(90deg, #ff0000, #ff8000, #ffff00, #00ff00, #0000ff, #8000ff);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            margin-top: 20px;
+        }
+        .add-profile-form {
+            padding: 10px;
+            border-top: 1px solid #eee;
+        }
+        .add-profile-form input {
+            padding: 5px;
+            margin-right: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .delete-profile {
+            color: #dc3545;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #333;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{% url 'visualizer:landing' %}" class="home-button">Synesthesia Visualizer</a>
+        <div class="header-controls">
+            <div class="profile-menu">
+                <button class="profile-button">
+                    Profile: {{ active_profile.name }} ▼
+                </button>
+                <div class="profile-dropdown">
+                    {% for profile in profiles %}
+                    <div class="profile-item {% if profile.id == active_profile.id %}active-profile{% endif %}">
+                        <a href="{% url 'visualizer:switch_profile' profile.id %}" style="text-decoration: none; color: inherit;">
+                            {{ profile.name }}
+                        </a>
+                        {% if profiles|length > 1 %}
+                            <a href="{% url 'visualizer:delete_profile' profile.id %}" class="delete-profile" onclick="return confirm('Are you sure you want to delete this profile?')">×</a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <form class="add-profile-form" action="{% url 'visualizer:create_profile' %}" method="post">
+                        {% csrf_token %}
+                        <input type="text" name="profile_name" placeholder="New profile name" required>
+                        <button type="submit">+</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content">
+        <h1>Sequence-Space Synesthesia Visualizer</h1>
+        <p>Experience how people with sequence-space synesthesia perceive sequences in spatial arrangements.</p>
+        <div class="coming-soon">
+            Coming Soon! This feature is under development.
+        </div>
+        <a href="{% url 'visualizer:landing' %}" class="back-link">← Back to Home</a>
+    </div>
+
+    <script>
+        // Profile dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileButton = document.querySelector('.profile-button');
+            const profileDropdown = document.querySelector('.profile-dropdown');
+            
+            profileButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('show');
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!profileDropdown.contains(e.target) && !profileButton.contains(e.target)) {
+                    profileDropdown.classList.remove('show');
+                }
+            });
+            
+            profileDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+    </script>
+</body>
+</html>

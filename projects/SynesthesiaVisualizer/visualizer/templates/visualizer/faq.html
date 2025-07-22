@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FAQs - Synesthesia Visualizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(90deg, #ff0000, #ff8000, #ffff00, #00ff00, #0000ff, #8000ff);
+            box-sizing: border-box;
+            color: white;
+        }
+        .home-button {
+            text-decoration: none;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .content {
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+        }
+        .faq-section {
+            margin-bottom: 40px;
+        }
+        .question {
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .answer {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #333;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{% url 'visualizer:landing' %}" class="home-button">Synesthesia Visualizer</a>
+    </div>
+    
+    <div class="content">
+        <h1>Frequently Asked Questions (FAQs)</h1>
+        
+        <div class="faq-section">
+            <div class="question">What is synesthesia?</div>
+            <div class="answer">
+                Synesthesia is a neurological phenomenon where stimulation of one sensory or cognitive pathway leads to involuntary experiences in another sensory or cognitive pathway. For example, some people see specific colors when they read letters or numbers, hear music, or think about time periods.
+            </div>
+
+            <div class="question">What types of synesthesia does this visualizer support?</div>
+            <div class="answer">
+                Currently, we support three types of synesthesia:
+                <ul>
+                    <li>Grapheme-color: Seeing letters and numbers in specific colors</li>
+                    <li>Sequence-space: Experiencing time units (like months or numbers) in spatial arrangements</li>
+                    <li>Ticker-tape: Seeing spoken words appear visually as they're heard</li>
+                </ul>
+            </div>
+
+            <div class="question">Can I customize the colors?</div>
+            <div class="answer">
+                Yes! Each profile has its own color settings. You can customize colors for letters, numbers, and mathematical symbols through the "Customize your colors" option in the grapheme-color visualizer.
+            </div>
+
+            <div class="question">What are profiles used for?</div>
+            <div class="answer">
+                Profiles allow you to save different color combinations and settings. This is useful if multiple people use the visualizer, or if you want to experiment with different color combinations. Each profile saves its own color settings and preferences.
+            </div>
+
+            <div class="question">What is "word shading"?</div>
+            <div class="answer">
+                Word shading is a feature where the first letter of each word adds a subtle background color to the entire word. This reflects how some synesthetes experience words taking on the color of their first letter. You can toggle this feature on/off in the grapheme-color visualizer.
+            </div>
+
+            <div class="question">What is the "bright letters" feature?</div>
+            <div class="answer">
+                Some synesthetes experience certain letters as being brighter or more vivid than others. The bright letters feature allows you to select which letters appear at full brightness, while others appear slightly dimmed. This creates a more authentic representation of how some people experience grapheme-color synesthesia.
+            </div>
+        </div>
+        
+        <a href="{% url 'visualizer:landing' %}" class="back-link">← Back to Home</a>
+    </div>
+</body>
+</html>

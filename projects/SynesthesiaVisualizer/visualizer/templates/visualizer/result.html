@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Synesthesia Visualization Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .visualization {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-size: 24px;
+            line-height: 1.5;
+        }
+        .colored-char {
+            display: inline-block;
+            padding: 0 1px;
+            margin: 0;
+            border-radius: 2px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #333;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Visualization Result</h1>
+    <div class="visualization">
+        {% for item in colored_text %}
+            <span class="colored-char" style="color: {{ item.color }}; background-color: {{ item.background }}">{{ item.char }}</span>
+        {% endfor %}
+    </div>
+    <a href="{% url 'visualizer:landing' %}" class="back-link">← Back to Home</a>
+</body>
+</html>

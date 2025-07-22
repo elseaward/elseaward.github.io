@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Synesthesia Visualizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(90deg, #ff0000, #ff8000, #ffff00, #00ff00, #0000ff, #8000ff);
+            box-sizing: border-box;
+            color: white;
+        }
+        .home-button {
+            text-decoration: none;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .profile-menu {
+            position: relative;
+            cursor: pointer;
+            color: white;
+        }
+        .profile-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+        .profile-dropdown.show {
+            display: block;
+        }
+        /* Remove the hover style since we're using click */
+        .profile-menu:hover .profile-dropdown {
+            display: none;
+        }
+        .profile-item {
+            padding: 8px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #333;
+        }
+        .profile-item:hover {
+            background-color: #f5f5f5;
+        }
+        .active-profile {
+            background-color: #e8f4e8;
+        }
+        .settings-link {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .settings-link:hover, .profile-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .profile-toolbar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .add-profile-form {
+            padding: 10px;
+            border-top: 1px solid #eee;
+        }
+        .add-profile-form input {
+            padding: 5px;
+            margin-right: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .delete-profile {
+            color: #dc3545;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        textarea {
+            width: calc(100% - 4px);
+            height: 150px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 16px;
+            line-height: 1.4;
+            padding: 10px;
+            background: white;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            background-image: linear-gradient(white, white), 
+                linear-gradient(to right, #ff0000, #ff9900, #ffff00, #33cc33, #3399ff, #9933ff);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            outline: none;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border: 2px solid transparent;
+            background-image: linear-gradient(white, white), 
+                linear-gradient(to right, #ff0000, #ff9900, #ffff00, #33cc33, #3399ff, #9933ff);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+        }
+        .form-container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .visualization {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 16px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            border: 2px solid transparent;
+            background-image: linear-gradient(white, white), 
+                linear-gradient(to right, #ff0000, #ff9900, #ffff00, #33cc33, #3399ff, #9933ff);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            box-sizing: border-box;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .visualization-line {
+            display: block;
+            min-height: 1.4em;
+        }
+        .colored-char {
+            display: inline-block;
+            padding: 0 1px;
+            margin: 0;
+            border-radius: 2px;
+        }
+        .math-symbols-row {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            align-items: center;
+        }
+        .math-symbol-btn {
+            font-family: 'Noto Sans Math', 'Arial Unicode MS', sans-serif;
+            font-size: 18px;
+            padding: 8px 12px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            min-width: 35px;
+            text-align: center;
+        }
+        .math-symbol-btn:hover {
+            background-color: #e0e0e0;
+        }
+        .symbols-label {
+            font-size: 14px;
+            color: #666;
+            margin-right: 10px;
+        }
+        .color-settings-btn {
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            padding: 8px 12px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            color: #333;
+        }
+        .color-settings-btn:hover {
+            background-color: #e0e0e0;
+        }
+        .word-shading-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .word-shading-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .word-shading-option label {
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+        }
+        .bright-letters-container {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+        .letter-selector {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 5px;
+            padding: 5px;
+        }
+        .letter-btn {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+        .letter-btn:hover {
+            background-color: #f5f5f5;
+        }
+        .letter-btn.selected {
+            color: white !important;
+            border-color: currentColor;
+            background-color: currentColor;
+        }
+        .bright-letters-container.show {
+            display: block;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #333;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{% url 'visualizer:landing' %}" class="home-button">Synesthesia Visualizer</a>
+        <div class="header-controls">
+            <div class="profile-menu">
+                <button class="profile-button">
+                    Profile: {{ active_profile.name }} ▼
+                </button>
+                <div class="profile-dropdown">
+                    {% for profile in profiles %}
+                    <div class="profile-item {% if profile.id == active_profile.id %}active-profile{% endif %}">
+                        <a href="{% url 'visualizer:switch_profile' profile.id %}" style="text-decoration: none; color: inherit;">
+                            {{ profile.name }}
+                        </a>
+                        {% if profiles|length > 1 %}
+                            <a href="{% url 'visualizer:delete_profile' profile.id %}" class="delete-profile" onclick="return confirm('Are you sure you want to delete this profile?')">×</a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <form class="add-profile-form" action="{% url 'visualizer:create_profile' %}" method="post">
+                        {% csrf_token %}
+                        <input type="text" name="profile_name" placeholder="New profile name" required>
+                        <button type="submit">+</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="padding: 20px; max-width: 800px; margin: 0 auto;">
+        <h1 style="text-align: center; margin-bottom: 20px; color: #333;">Grapheme-color Synesthesia Visualizer</h1>
+        <div class="form-container">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                <div>
+                    <div class="word-shading-option">
+                        <input type="checkbox" id="wordShadingEnabled" name="word_shading_enabled" {% if active_profile.word_shading_enabled %}checked{% endif %}>
+                        <label for="wordShadingEnabled">First letter shades whole word</label>
+                    </div>
+                    <div class="word-shading-option" style="margin-top: 10px;">
+                        <input type="checkbox" id="brightLettersEnabled" name="bright_letters_enabled" {% if active_profile.bright_letters_enabled %}checked{% endif %}>
+                        <label for="brightLettersEnabled">Some letters are brighter than others</label>
+                    </div>
+                    <div class="bright-letters-container {% if active_profile.bright_letters_enabled %}show{% endif %}">
+                        <div class="letter-selector">
+                            {% for char, color in colors.items %}
+                                {% if char|length == 1 and char|lower in "abcdefghijklmnopqrstuvwxyz" %}
+                                <button type="button" 
+                                    class="letter-btn {% if char in active_profile.get_bright_letters %}selected{% endif %}" 
+                                    data-letter="{{ char }}"
+                                    data-color="{{ color }}">
+                                    {{ char }}
+                                </button>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'visualizer:color_settings' %}" class="color-settings-btn">Customize your colors</a>
+            </div>
+            <div class="math-symbols-row">
+                <span class="symbols-label">Symbols:</span>
+                <button type="button" class="math-symbol-btn" data-symbol="±">±</button>
+                <button type="button" class="math-symbol-btn" data-symbol="√">√</button>
+                <button type="button" class="math-symbol-btn" data-symbol="π">π</button>
+                <button type="button" class="math-symbol-btn" data-symbol="%">%</button>
+                <button type="button" class="math-symbol-btn" data-symbol="∞">∞</button>
+                <button type="button" class="math-symbol-btn" data-symbol="∫">∫</button>
+                <button type="button" class="math-symbol-btn" data-symbol="∑">∑</button>
+                <button type="button" class="math-symbol-btn" data-symbol="∏">∏</button>
+                <button type="button" class="math-symbol-btn" data-symbol="Δ">Δ</button>
+                <button type="button" class="math-symbol-btn" data-symbol="≈">≈</button>
+                <button type="button" class="math-symbol-btn" data-symbol="≠">≠</button>
+                <button type="button" class="math-symbol-btn" data-symbol="≤">≤</button>
+                <button type="button" class="math-symbol-btn" data-symbol="≥">≥</button>
+            </div>
+            <p>Enter your text below (max 500 characters):</p>
+            <textarea id="inputText" name="text" maxlength="500" required>{{ original_text }}</textarea>
+            <div id="visualizationPreview" class="visualization"></div>
+        </div>
+        <a href="{% url 'visualizer:landing' %}" class="back-link">← Back to Home</a>
+    </div>
+
+    <script>
+        // Profile dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileButton = document.querySelector('.profile-button');
+            const profileDropdown = document.querySelector('.profile-dropdown');
+            const wordShadingCheckbox = document.getElementById('wordShadingEnabled');
+            const brightLettersCheckbox = document.getElementById('brightLettersEnabled');
+            const brightLettersContainer = document.querySelector('.bright-letters-container');
+            
+            // Toggle dropdown on button click
+            profileButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('show');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!profileDropdown.contains(e.target) && !profileButton.contains(e.target)) {
+                    profileDropdown.classList.remove('show');
+                }
+            });
+            
+            // Prevent dropdown from closing when clicking inside it
+            profileDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            // Handle word shading checkbox changes
+            wordShadingCheckbox.addEventListener('change', async function() {
+                try {
+                    const response = await fetch('{% url "visualizer:save_word_shading" %}', {
+                        method: 'POST',
+                        body: JSON.stringify({ enabled: this.checked }),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (response.ok) {
+                        // Update visualization with new setting
+                        updateVisualization();
+                    }
+                } catch (error) {
+                    console.error('Error saving word shading preference:', error);
+                }
+            });
+
+            // Toggle bright letters container visibility
+            brightLettersCheckbox.addEventListener('change', async function() {
+                brightLettersContainer.classList.toggle('show', this.checked);
+                try {
+                    const selectedLetters = Array.from(document.querySelectorAll('.letter-btn.selected'))
+                        .map(btn => btn.dataset.letter)
+                        .join(',');
+                    
+                    const response = await fetch('{% url "visualizer:save_bright_letters" %}', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            enabled: this.checked,
+                            letters: selectedLetters
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (response.ok) {
+                        updateVisualization();
+                    }
+                } catch (error) {
+                    console.error('Error saving bright letters preference:', error);
+                }
+            });
+            
+            // Handle letter button clicks
+            document.querySelectorAll('.letter-btn').forEach(button => {
+                // Set initial color from data attribute
+                const color = button.dataset.color;
+                button.style.color = color;
+                
+                button.addEventListener('click', async function() {
+                    const letter = this.dataset.letter;
+                    this.classList.toggle('selected');
+                    
+                    // Update colors based on selection state
+                    if (this.classList.contains('selected')) {
+                        this.style.backgroundColor = color;
+                        this.style.borderColor = color;
+                    } else {
+                        this.style.backgroundColor = '';
+                        this.style.borderColor = '#ddd';
+                    }
+                    
+                    const selectedLetters = Array.from(document.querySelectorAll('.letter-btn.selected'))
+                        .map(btn => btn.dataset.letter)
+                        .join(',');
+                    
+                    try {
+                        const response = await fetch('{% url "visualizer:save_bright_letters" %}', {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                enabled: brightLettersCheckbox.checked,
+                                letters: selectedLetters
+                            }),
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        });
+                        if (response.ok) {
+                            updateVisualization();
+                        }
+                    } catch (error) {
+                        console.error('Error saving bright letters:', error);
+                    }
+                });
+            });
+
+            // Trigger initial visualization if there's text in the input
+            const inputText = document.getElementById('inputText');
+            if (inputText.value) {
+                updateVisualization();
+            }
+        });
+
+        // Real-time visualization
+        const inputText = document.getElementById('inputText');
+        const preview = document.getElementById('visualizationPreview');
+        let typingTimer;
+
+        // Handle math symbol button clicks
+        document.querySelectorAll('.math-symbol-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const symbol = this.getAttribute('data-symbol');
+                const start = inputText.selectionStart;
+                const end = inputText.selectionEnd;
+                const text = inputText.value;
+                
+                // Insert the symbol at cursor position
+                inputText.value = text.substring(0, start) + symbol + text.substring(end);
+                
+                // Move cursor after the inserted symbol
+                inputText.selectionStart = inputText.selectionEnd = start + 1;
+                
+                // Trigger the visualization update
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(updateVisualization, 100);
+                
+                // Focus back on textarea
+                inputText.focus();
+            });
+        });
+
+        async function updateVisualization() {
+            const text = inputText.value;
+            try {
+                const response = await fetch('{% url "visualizer:get_colors_for_text" %}', {
+                    method: 'POST',
+                    body: JSON.stringify({ text: text }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                const data = await response.json();
+                const lines = data.colored_text.reduce((acc, item) => {
+                    if (item.char === '\n') {
+                        acc.push([]);
+                    } else {
+                        if (acc.length === 0) acc.push([]);
+                        acc[acc.length - 1].push(item);
+                    }
+                    return acc;
+                }, []);
+
+                preview.innerHTML = lines.map(line => 
+                    `<div class="visualization-line">${
+                        line.map(item => 
+                            `<span class="colored-char" style="color: ${item.color}; background-color: ${item.background}">${item.char}</span>`
+                        ).join('')
+                    }</div>`
+                ).join('');
+            } catch (error) {
+                console.error('Error updating visualization:', error);
+            }
+        }
+
+        inputText.addEventListener('input', function() {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(updateVisualization, 100);
+        });
+
+        // Add profile dropdown keyboard accessibility
+        document.querySelector('.profile-menu').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.querySelector('.profile-dropdown').style.display = 
+                    this.querySelector('.profile-dropdown').style.display === 'block' ? 'none' : 'block';
+            }
+        });
+    </script>
+</body>
+</html>
